@@ -4,7 +4,7 @@ This document describes the architecture and design decisions of the handbuilt-l
 
 ## System Architecture
 
-```
+```sh
 ┌─────────────────────────────────────────────────────────────┐
 │                       Docker Build Process                   │
 ├─────────────────────────────────────────────────────────────┤
@@ -35,6 +35,7 @@ This document describes the architecture and design decisions of the handbuilt-l
 ### 1. Build System
 
 #### Dockerfile
+
 Multi-stage build with 8 distinct stages:
 
 1. **builder-base**: Base image with build dependencies
@@ -47,6 +48,7 @@ Multi-stage build with 8 distinct stages:
 8. **runtime**: Final minimal runtime image
 
 #### Benefits
+
 - **Layer caching**: Faster rebuilds
 - **Parallel builds**: Independent stages can build concurrently
 - **Size optimization**: Final image only contains necessary artifacts
@@ -57,12 +59,14 @@ Multi-stage build with 8 distinct stages:
 **Source**: torvalds/linux (latest)
 
 **Configuration**: `linux.config`
+
 - Minimal feature set
 - x86_64 architecture
 - Required drivers only
 - No unnecessary modules
 
 **Build Process**:
+
 ```bash
 make olddefconfig
 make -j$(nproc)
@@ -76,11 +80,13 @@ strip --strip-debug arch/x86/boot/bzImage
 **Source**: git.busybox.net/busybox (latest)
 
 **Configuration**: `busybox.config`
+
 - Essential utilities only
 - Static linking
 - Minimal size
 
 **Provides**:
+
 - Shell (sh)
 - Core utilities (ls, cp, mv, etc.)
 - System utilities (mount, ps, top, etc.)
@@ -93,6 +99,7 @@ strip --strip-debug arch/x86/boot/bzImage
 **File**: `init.sh`
 
 **Responsibilities**:
+
 - Mount essential filesystems (/proc, /sys, /dev, /tmp, /run)
 - Populate /dev with device nodes
 - Set hostname
@@ -100,6 +107,7 @@ strip --strip-debug arch/x86/boot/bzImage
 - Start shell (PID 1)
 
 **Design Philosophy**:
+
 - Simple and transparent
 - No complex service management
 - Easy to understand and modify
@@ -112,6 +120,7 @@ strip --strip-debug arch/x86/boot/bzImage
 **Configuration**: `syslinux.cfg`
 
 **Boot Process**:
+
 1. BIOS/UEFI loads bootloader
 2. Bootloader loads kernel (bzImage)
 3. Kernel decompresses and initializes
@@ -123,13 +132,16 @@ strip --strip-debug arch/x86/boot/bzImage
 ### 6. Build Scripts
 
 #### build.sh
+
 Creates bootable disk image with:
+
 - Error handling and validation
 - Logging with colors
 - Command-line options
 - Cleanup on exit
 
 #### scripts/
+
 - `extract.sh`: Extract artifacts from Docker
 - `test.sh`: Automated testing
 - `clean.sh`: Cleanup build artifacts
@@ -137,7 +149,9 @@ Creates bootable disk image with:
 ### 7. Automation
 
 #### Makefile
+
 Provides convenient targets for:
+
 - Building Docker image
 - Extracting artifacts
 - Running tests
@@ -145,13 +159,17 @@ Provides convenient targets for:
 - Cleanup operations
 
 #### docker-compose.yml
+
 Defines services:
+
 - `builder`: Builds distribution
 - `dev`: Development environment
 - `qemu`: Testing environment
 
 #### GitHub Actions
+
 Automated CI/CD pipeline:
+
 - Build on every push
 - Run tests
 - Security scanning
@@ -162,7 +180,7 @@ Automated CI/CD pipeline:
 
 ### Build Flow
 
-```
+```sh
 Source Code
     ↓
 Docker Build
@@ -187,7 +205,7 @@ Docker Build
 
 ### Boot Flow
 
-```
+```sh
 Power On
     ↓
 BIOS/UEFI
@@ -212,18 +230,21 @@ Shell
 ## Security Considerations
 
 ### Build-time Security
+
 - Multi-stage builds isolate build environment
 - No build tools in final image
 - Minimal dependencies
 - Regular source updates
 
 ### Runtime Security
+
 - Non-root user in Docker
 - Minimal attack surface
 - No network services by default
 - Read-only root filesystem possible
 
 ### Supply Chain Security
+
 - Verified source repositories
 - Checksums for downloads
 - Security scanning in CI
@@ -232,18 +253,21 @@ Shell
 ## Performance Optimizations
 
 ### Build Performance
+
 - Layer caching
 - Parallel compilation
 - Build cache mounts
 - Incremental builds
 
 ### Runtime Performance
+
 - Static linking (no dynamic loading overhead)
 - Minimal kernel
 - Fast boot time (~1-2 seconds)
 - Low memory footprint (~10-20MB)
 
 ### Size Optimizations
+
 - Strip debug symbols
 - Minimal kernel configuration
 - Single BusyBox binary
@@ -252,6 +276,7 @@ Shell
 ## Extensibility
 
 ### Adding Packages
+
 ```dockerfile
 # In busybox-builder stage
 RUN cd /build/initramfs && \
@@ -260,10 +285,13 @@ RUN cd /build/initramfs && \
 ```
 
 ### Custom Init Scripts
+
 Modify `init.sh` or add to `/etc/init.d/`
 
 ### Kernel Modules
+
 Enable in `linux.config`:
+
 ```bash
 make menuconfig
 # Enable desired modules
@@ -271,7 +299,9 @@ cp .config linux.config
 ```
 
 ### Network Services
+
 Add to `init.sh`:
+
 ```bash
 # Start network
 ifconfig eth0 up
@@ -284,16 +314,19 @@ httpd -h /www
 ## Testing Strategy
 
 ### Unit Tests
+
 - Script syntax validation
 - File existence checks
 - Format validation
 
 ### Integration Tests
+
 - Full build process
 - Docker image testing
 - Artifact extraction
 
 ### System Tests
+
 - QEMU boot testing
 - Functional testing
 - Performance benchmarks
@@ -301,6 +334,7 @@ httpd -h /www
 ## Future Enhancements
 
 ### Planned Features
+
 - [ ] UEFI boot support
 - [ ] ARM architecture support
 - [ ] Package manager integration
@@ -309,6 +343,7 @@ httpd -h /www
 - [ ] Persistent storage support
 
 ### Under Consideration
+
 - [ ] Systemd alternative
 - [ ] Container runtime
 - [ ] Full development environment
