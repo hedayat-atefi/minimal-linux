@@ -1,0 +1,68 @@
+# Build artifacts
+*.iso
+*.img
+bzImage
+initramfs
+initramfs.cpio
+initramfs.cpio.gz
+output.iso
+boot.img
+
+# Compiled sources
+*.o
+*.ko
+*.obj
+*.elf
+*.so
+*.a
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Directories
+mnt/
+myiso/
+initramfs/
+build/
+dist/
+output/
+
+# Docker volumes
+.docker/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Archives
+*.tar.gz
+*.tar.bz2
+*.zip
+*.rar
+
+# Kernel build artifacts
+.config.old
+.version
+Module.symvers
+modules.builtin
+modules.order
+
+# Test outputs
+test-results/
+coverage/
