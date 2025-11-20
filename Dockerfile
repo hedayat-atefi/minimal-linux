@@ -43,7 +43,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         cpio \
         libelf-dev \
         libssl-dev \
-        syslinux \
+        syslinux-common \
         dosfstools \
         genisoimage \
         wget \
@@ -63,7 +63,7 @@ FROM builder-base AS source-downloader
 
 ARG LINUX_VERSION=master
 ARG BUSYBOX_VERSION=master
-ARG SYSLINUX_VERSION=6.04-pre1
+ARG SYSLINUX_VERSION=6.03
 
 # Create directory structure
 RUN mkdir -p /build/initramfs && \
@@ -93,12 +93,15 @@ RUN --mount=type=cache,target=/build/cache \
     fi
 
 # Download and extract Syslinux
+# Note: Using alternative download locations due to mirror availability
 WORKDIR /build/sources
 RUN curl -fsSL -o syslinux.tar.gz \
-        "https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/${SYSLINUX_VERSION}/syslinux-${SYSLINUX_VERSION}.tar.gz" && \
+        "https://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz" || \
+    curl -fsSL -o syslinux.tar.gz \
+        "https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz" && \
     tar xzf syslinux.tar.gz && \
     rm syslinux.tar.gz && \
-    mv "syslinux-${SYSLINUX_VERSION}" syslinux
+    mv syslinux-* syslinux
 
 # -----------------------------------------------------------------------------
 # Stage 3: Build Linux kernel

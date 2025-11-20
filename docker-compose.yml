@@ -12,7 +12,7 @@ services:
       args:
         - LINUX_VERSION=master
         - BUSYBOX_VERSION=master
-        - SYSLINUX_VERSION=6.04-pre1
+        - SYSLINUX_VERSION=6.03
         - BUILD_JOBS=auto
     image: handbuilt-linux:latest
     container_name: handbuilt-linux-builder
